@@ -1,5 +1,7 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import { RecadosService } from './recados.service';
+import { CreateRecado } from './dto/create-recado.dto';
+import { UpdateRecado } from './dto/update-recado.dto';
 
 @Controller('recados')
 export class RecadosController {
@@ -12,7 +14,7 @@ export class RecadosController {
   // }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ParseIntPipe) id: number) {
     this.recadosService.findOne(id);
   }
 
@@ -25,18 +27,18 @@ export class RecadosController {
   }
 
   @Post()
-  create(@Body() body: any) {
-    return this.recadosService.create(body);
+  create(@Body() CreateRecado: CreateRecado) {
+    return this.recadosService.create(CreateRecado);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() body: any) {
-    return this.recadosService.update(id, body);
+  update(@Param('id') id: string, @Body() UpdateRecado: UpdateRecado) {
+    return this.recadosService.update(id, UpdateRecado);
   }
 
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', ParseIntPipe) id: number) {
     return this.recadosService.remove(id);
   }
 }

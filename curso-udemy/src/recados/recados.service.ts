@@ -1,58 +1,70 @@
-import { Injectable } from '@nestjs/common';
-import { RecadoEntity } from './entites/recado.entity';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Recado } from './entites/recado';
+import { CreateRecado } from './dto/create-recado.dto';
+import { UpdateRecado } from './dto/update-recado.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class RecadosService {
 
+  constructor(
+    @InjectRepository(Recado)
+    private readonly recadosRepository: Repository<Recado>,
+  ) {
+  }
+
   private lastId = 1;
-  private recados: RecadoEntity[] = [
-    {
-      id: 1,
-      texto: 'recado teste',
-      de: 'Ogo',
-      para: 'Diogo',
-      lido: false,
-      data: new Date()
-    },
-  ];
+  private recados: Recado[] = [];
 
-  findAll(){
-    return this.recados;
-  }
-  findOne(id: string){
-    return this.recados.find(item => item.id === +id);
+  async findAll() {
+    const recados = await this.recadosRepository.find();
+    return recados;
   }
 
-  create(body: any) {
-    this.lastId++;
-    const id = this.lastId;
+  async findOne(id: number) {
+    const recado = await this.recadosRepository.findOne({
+      where: { id },
+    });
+
+    if (!recado) {
+      throw new NotFoundException(`Recado with id ${id} not found`);
+    }
+  }
+
+  async create(CreateRecado: CreateRecado) {
     const newRecado = {
-      id,
-      ...body,
+      ...CreateRecado,
+      lido: false,
+      data: new Date(),
     };
-    this.recados.push(newRecado);
 
-    return newRecado;
+    const recado = await this.recadosRepository.save(newRecado);
+
+    return this.recadosRepository.save(recado);
+
   }
 
-  update(id: string, body: any) {
-      const recadoExistenteIndex = this.recados.findIndex(item => item.id === +id);
-      if (recadoExistenteIndex >= 0) {
-        const recadoExistente = this.recados[recadoExistenteIndex];
-
-        this.recados[recadoExistenteIndex] = {
-          ...recadoExistente,
-          ...body
-        };
-      }
-  }
-
-  remove(id: string){
+  update(id: string, UpdateRecado: UpdateRecado) {
     const recadoExistenteIndex = this.recados.findIndex(item => item.id === +id);
     if (recadoExistenteIndex >= 0) {
-      this.recados.splice(recadoExistenteIndex, 1);
-    }
+      const recadoExistente = this.recados[recadoExistenteIndex];
 
+      this.recados[recadoExistenteIndex] = {
+        ...recadoExistente,
+        ...UpdateRecado,
+      };
+    }
+  }
+
+  async remove(id: number) {
+   const recado = await this.recadosRepository.findOneBy({
+      id,
+   });
+   if(!recado)
+     throw new NotFoundException(`Recado with id ${id} not found`);
+
+    return this.recadosRepository.remove(recado);
   }
 
 }
