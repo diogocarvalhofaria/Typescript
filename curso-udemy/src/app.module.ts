@@ -4,10 +4,10 @@ import { AppService } from './app.service';
 import { RecadosModule } from './recados/recados.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Recado } from './recados/entites/recado';
+import { PessoasModule } from './pessoas/pessoas.module';
 
 @Module({
   imports: [
-
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: '127.0.0.1',
@@ -15,10 +15,12 @@ import { Recado } from './recados/entites/recado';
       username: 'root',
       password: 'mestre',
       database: 'recados',
-      entities: [Recado],
+      entities: ['dist/**/*.entity{.ts,.js}'],
       synchronize: true,
     }),
-    RecadosModule],
+    RecadosModule,
+    PessoasModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

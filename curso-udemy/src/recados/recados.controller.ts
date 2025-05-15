@@ -1,17 +1,26 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { RecadosService } from './recados.service';
-import { CreateRecado } from './dto/create-recado.dto';
+import { CreateRecadoInput } from './dto/create-recado.dto';
 import { UpdateRecado } from './dto/update-recado.dto';
 
 @Controller('recados')
 export class RecadosController {
-  constructor(private readonly recadosService: RecadosService) {
-  }
+  constructor(private readonly recadosService: RecadosService) {}
 
-  @Get('')
-  // findAll() {
-  //   return 'essa rota é para todos os recados';
-  // }
+  // @Get('')
+  // // findAll() {
+  // //   return 'essa rota é para todos os recados';
+  // // }
 
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
@@ -23,19 +32,20 @@ export class RecadosController {
     const { limit = 10, offset = 0 } = pagination;
     // return `essa rota é para um recado. Limit ${limit} e ${offset}`;
     return this.recadosService.findAll();
-
   }
 
   @Post()
-  create(@Body() CreateRecado: CreateRecado) {
+  create(@Body() CreateRecado: CreateRecadoInput) {
     return this.recadosService.create(CreateRecado);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() UpdateRecado: UpdateRecado) {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() UpdateRecado: UpdateRecado,
+  ) {
     return this.recadosService.update(id, UpdateRecado);
   }
-
 
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {
